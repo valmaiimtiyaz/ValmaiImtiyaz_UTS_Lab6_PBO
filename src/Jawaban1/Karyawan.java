@@ -6,6 +6,7 @@ public class Karyawan {
     private String posisi;
     private double gaji;
 
+    // Constructor untuk mengisi data awal karyawan
     public Karyawan(String id, String nama, String posisi, double gaji) {
         this.id = id;
         this.nama = nama;
@@ -13,6 +14,7 @@ public class Karyawan {
         this.gaji = gaji;
     }
 
+    // Getter digunakan untuk mengambil nilai atribut
     public String getId() {
         return id;
     }
@@ -26,6 +28,7 @@ public class Karyawan {
         return gaji;
     }
 
+    // Setter digunakan untuk mengubah nilai atribut yang diperlukan
     public void setNama (String nama){
         this.nama = nama;
     }
@@ -36,6 +39,7 @@ public class Karyawan {
         this.gaji = gaji;
     }
 
+    // Method toString digunakan untuk menampilkan data karyawan dalam bentuk teks
     @Override
     public String toString() {
         return "ID: " + id + ", Nama: " + nama + ", Posisi: " + posisi + ", Gaji: Rp" + gaji;
