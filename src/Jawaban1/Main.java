@@ -5,9 +5,9 @@ import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 
 public class Main {
-
     private Perusahaan perusahaan = new Perusahaan();
 
+    // Komponen utama pada tampilan GUI
     private JFrame frame;
     private JTextField tfId, tfNama, tfPosisi, tfGaji;
     private JTextField tfCariId, tfFilterPosisi;
@@ -15,6 +15,7 @@ public class Main {
     private DefaultTableModel tableModel;
     private JLabel labelTotalGaji;
 
+    // Constructor untuk membangun tampilan aplikasi
     public Main() {
         frame = new JFrame("Manajemen Data Karyawan");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -22,6 +23,7 @@ public class Main {
         frame.setLayout(new BorderLayout(10, 10));
         frame.getContentPane().setBackground(Color.decode("#DFD0B8"));
 
+        // Panel kiri untuk form input data karyawan
         JPanel panelForm = new JPanel(new BorderLayout());
         panelForm.setBackground(Color.decode("#DFD0B8"));
         panelForm.setBorder(BorderFactory.createMatteBorder(0, 0, 0, 2, Color.decode("#393E46")));
@@ -76,6 +78,7 @@ public class Main {
         tfGaji.setForeground(Color.decode("#393E46"));
         panelField.add(tfGaji);
 
+        // Tombol untuk simpan data dan hapus data
         JPanel panelCrud = new JPanel(new GridLayout(2, 1, 0, 5));
         panelCrud.setBackground(Color.decode("#DFD0B8"));
         JButton btnSimpan = new JButton("Simpan (Tambah/Update)");
@@ -95,6 +98,7 @@ public class Main {
         panelForm.add(panelFormCenter, BorderLayout.CENTER);
         frame.add(panelForm, BorderLayout.WEST);
 
+        // Panel kanan atas untuk fitur cari dan filter
         JPanel panelCariFilter = new JPanel(new GridBagLayout());
         panelCariFilter.setBackground(Color.decode("#DFD0B8"));
         panelCariFilter.setBorder(BorderFactory.createTitledBorder("Cari & Filter"));
@@ -133,6 +137,7 @@ public class Main {
         cfButton.gridwidth = 3;
         panelCariFilter.add(btnTampilSemua, cfButton);
 
+        // Panel tabel untuk menampilkan daftar karyawan
         JPanel panelTabel = new JPanel(new BorderLayout());
         panelTabel.setBackground(Color.decode("#DFD0B8"));
         panelTabel.setBorder(BorderFactory.createTitledBorder("Daftar Karyawan"));
@@ -168,17 +173,20 @@ public class Main {
         panelKanan.add(panelTabel, BorderLayout.CENTER);
         frame.add(panelKanan, BorderLayout.CENTER);
 
+        // Menghubungkan tombol dengan method yang sesuai
         btnSimpan.addActionListener(e -> simpanData());
         btnHapus.addActionListener(e -> hapusData());
         btnCari.addActionListener(e -> cariData());
         btnFilter.addActionListener(e -> filterData());
         btnTampilSemua.addActionListener(e -> refreshTabel());
 
+        // Menampilkan data awal dan menampilkan frame
         refreshTabel();
         frame.setLocationRelativeTo(null);
         frame.setVisible(true);
     }
 
+    // Method untuk menyimpan data baru atau memperbarui data lama
     private void simpanData() {
         String id = tfId.getText().trim();
         String nama = tfNama.getText().trim();
@@ -192,6 +200,7 @@ public class Main {
 
         Karyawan existing = perusahaan.getKaryawanById(id);
 
+        // Jika ID belum ada, data dianggap sebagai data baru
         if (existing == null) {
             if (nama.isEmpty() || posisi.isEmpty() || gajiText.isEmpty()) {
                 showMessage("Untuk menambahkan data baru, nama, posisi, dan gaji harus diisi lengkap.");
@@ -211,15 +220,14 @@ public class Main {
                 showMessage("Gaji harus diisi dalam format angka.");
             }
         } else {
+            // Jika ID sudah ada, data dianggap sebagai update
             if (nama.isEmpty()) {
                 nama = existing.getNama();
             }
-
             if (posisi.isEmpty() && gajiText.isEmpty()) {
                 showMessage("Isi posisi atau gaji untuk memperbarui data karyawan.");
                 return;
             }
-
             if (!nama.equals(existing.getNama())) {
                 showMessage("Nama karyawan tidak dapat diubah.");
                 return;
@@ -232,12 +240,10 @@ public class Main {
                 if (!posisi.isEmpty()) {
                     pesanPosisi = perusahaan.ubahPosisi(id, posisi);
                 }
-
                 if (!gajiText.isEmpty()) {
                     double gajiBaru = Double.parseDouble(gajiText);
                     pesanGaji = perusahaan.ubahGaji(id, gajiBaru);
                 }
-
                 if ((pesanPosisi + pesanGaji).contains("berhasil")) {
                     showMessage("Data karyawan berhasil diperbarui.");
                     refreshTabel();
@@ -252,6 +258,7 @@ public class Main {
         }
     }
 
+    // Method untuk menghapus data karyawan berdasarkan ID
     private void hapusData() {
         String id = tfId.getText().trim();
 
@@ -259,16 +266,15 @@ public class Main {
             showMessage("Masukkan ID karyawan yang ingin dihapus.");
             return;
         }
-
         String pesan = perusahaan.hapusKaryawan(id);
         showMessage(pesan);
-
         if (pesan.contains("berhasil")) {
             refreshTabel();
             clearForm();
         }
     }
 
+    // Method untuk mencari satu karyawan berdasarkan ID
     private void cariData() {
         String id = tfCariId.getText().trim();
 
@@ -279,7 +285,6 @@ public class Main {
 
         tableModel.setRowCount(0);
         Karyawan ditemukan = perusahaan.getKaryawanById(id);
-
         if (ditemukan == null) {
             showMessage("Data karyawan tidak ditemukan.");
         } else {
@@ -290,18 +295,16 @@ public class Main {
                     ditemukan.getGaji()
             });
         }
-
         labelTotalGaji.setText("Total Gaji Seluruh Karyawan: Rp" + perusahaan.totalGaji());
     }
 
+    // Method untuk memfilter data karyawan berdasarkan posisi
     private void filterData() {
         String posisi = tfFilterPosisi.getText().trim();
-
         if (posisi.isEmpty()) {
             showMessage("Masukkan posisi yang ingin difilter.");
             return;
         }
-
         tableModel.setRowCount(0);
 
         for (Karyawan k : perusahaan.getDaftarKaryawan()) {
@@ -314,10 +317,10 @@ public class Main {
                 });
             }
         }
-
         labelTotalGaji.setText("Total Gaji Seluruh Karyawan: Rp" + perusahaan.totalGaji());
     }
 
+    // Method bantuan untuk mengatur posisi komponen pada GridBagLayout
     private GridBagConstraints createConstraints(int x, int y, double weightx) {
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.gridx = x;
@@ -328,6 +331,7 @@ public class Main {
         return gbc;
     }
 
+    // Method untuk menampilkan seluruh data karyawan ke tabel
     private void refreshTabel() {
         tableModel.setRowCount(0);
         for (Karyawan k : perusahaan.getDaftarKaryawan()) {
@@ -341,6 +345,7 @@ public class Main {
         labelTotalGaji.setText("Total Gaji Seluruh Karyawan: Rp" + perusahaan.totalGaji());
     }
 
+    // Method untuk mengosongkan kembali field input
     private void clearForm() {
         tfId.setText("");
         tfNama.setText("");
@@ -348,12 +353,14 @@ public class Main {
         tfGaji.setText("");
     }
 
+    // Method untuk menampilkan pesan popup kepada pengguna
     private void showMessage(String message) {
         JLabel label = new JLabel(message);
         label.setHorizontalAlignment(SwingConstants.CENTER);
         JOptionPane.showMessageDialog(frame, label, "Pesan", JOptionPane.PLAIN_MESSAGE);
     }
 
+    // Method utama untuk menjalankan aplikasi
     public static void main(String[] args) {
         SwingUtilities.invokeLater(Main::new);
     }
